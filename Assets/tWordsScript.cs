@@ -274,4 +274,27 @@ public class tWordsScript : MonoBehaviour
 				flashing = false;
 				Start();
 		}
+		
+#pragma warning disable 0414
+    private readonly string TwitchHelpMessage = "Press the buttons with “!{0} |press|submit|p|s| 1324”. They are numbered 1–4, top to bottom.";
+#pragma warning restore 0414
+    private IEnumerator ProcessTwitchCommand(string command)
+    {
+        var match = Regex.Match(command, @"^\s*(?:press |submit |p |s |)([1-4 ]+)\s*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        if (match.Success)
+        {
+            yield return null;
+            foreach (var btn in match.Groups[1].Value.Where(ch => ch != ' ').Select(ch => words[ch - '1']))
+            {
+                btn.OnInteract();
+                yield return new WaitForSeconds(.1f);
+            }
+            yield break;
+        }
+        else
+        {
+            yield return "sendtochaterror What are you? An idiot? Use press, submit, p, s with the numbers 1-4 to submit your answer.";
+            yield break;
+        }
+    }
 }
